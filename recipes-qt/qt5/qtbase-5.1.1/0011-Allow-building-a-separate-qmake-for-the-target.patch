@@ -1,0 +1,26 @@
+From dd14f3eda61669c66c95dbcbca3afbd61f9aa746 Mon Sep 17 00:00:00 2001
+From: Paul Eggleton <paul.eggleton@linux.intel.com>
+Date: Mon, 29 Oct 2012 20:26:36 -0700
+Subject: [PATCH 11/14] Allow building a separate qmake for the target
+
+Upstream-Status: Inappropriate [config]
+
+Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
+Signed-off-by: Mikko Levonmaa <mikko.levonmaa@gmail.com>
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ qmake/qmake.pro | 2 ++
+ 1 file changed, 2 insertions(+)
+
+Index: qtbase-opensource-src-5.1.1/qmake/qmake.pro
+===================================================================
+--- qtbase-opensource-src-5.1.1.orig/qmake/qmake.pro	2014-04-18 00:52:32.000000000 +0000
++++ qtbase-opensource-src-5.1.1/qmake/qmake.pro	2014-04-18 01:08:02.253245140 +0000
+@@ -8,6 +8,7 @@
+ DEFINES += QT_BUILD_QMAKE QT_BOOTSTRAPPED \
+     PROEVALUATOR_FULL PROEVALUATOR_DEBUG
+ DESTDIR = ../bin/
++TARGET = qmake
+ 
+ OBJECTS_DIR = .
+ MOC_DIR = .
