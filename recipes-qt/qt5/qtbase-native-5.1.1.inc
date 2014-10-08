@@ -28,7 +28,7 @@ SRC_URI += " \
 "
 
 # specific for native version
-SRC_URI += "file://0001-Always-build-uic.patch"
+SRC_URI += "file://0010-Always-build-uic.patch"
 
 QT_CONF_PATH = "${B}/qt.conf"
 
@@ -55,6 +55,7 @@ EXTRA_OECONF = " \
     -no-opengl \
     -no-openssl \
     -no-xcb \
+    -no-icu \
     -verbose \
     -release \
     -prefix ${OE_QMAKE_PATH_PREFIX} \
