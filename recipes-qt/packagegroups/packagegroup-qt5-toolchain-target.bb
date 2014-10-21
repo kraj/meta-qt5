@@ -15,7 +15,6 @@ USE_RUBY = " \
     qtquick1-qmlplugins \
     qttools-dev \
     qttools-mkspecs \
-    qttools-plugins \
     qttools-staticdev \
     qttools-tools \
     qtwebkit-dev \
@@ -48,9 +47,6 @@ RDEPENDS_${PN} += " \
     qtbase-mkspecs \
     qtbase-plugins \
     qtbase-staticdev \
-    qtconnectivity-dev \
-    qtconnectivity-mkspecs \
-    qtconnectivity-qmlplugins \
     qtdeclarative-dev \
     qtdeclarative-mkspecs \
     qtdeclarative-plugins \
