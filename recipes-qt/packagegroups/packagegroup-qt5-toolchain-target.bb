@@ -23,12 +23,7 @@ USE_RUBY = " \
 "
 
 # Requires Wayland to work
-USE_WAYLAND = " \
-    qtwayland-dev \
-    qtwayland-mkspecs \
-    qtwayland-plugins \
-    qtwayland-tools \
-"
+USE_WAYLAND = ""
 
 # Requires X11 to work
 USE_X11 = " \

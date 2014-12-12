@@ -16,7 +16,7 @@ PR = "r1"
 SRC_URI += "\
     file://0001-Add-linux-oe-g-platform.patch \
     file://0002-qlibraryinfo-allow-to-set-qt.conf-from-the-outside-u.patch \
-    file://0003-Add-external-hostbindir-option.patch \
+    file://0003-Add-external-hostbindir-option-to-nativesdk.patch \
     file://0004-configureapp-Prefix-default-LIBDIRS-and-INCDIRS-with.patch \
     file://0005-qt_module-Fix-pkgconfig-replacement.patch \
     file://0006-configure-don-t-export-SYSTEM_VARIABLES-to-.qmake.va.patch \
@@ -199,6 +199,16 @@ do_configure() {
 
 }
 
+# Set the EXTRA_QTLIB variable to e.g. Xml, in order to not remove libQt5Xml.so.*
+EXTRA_QTLIB ?= ""
+
+python __anonymous () {
+    templibs = ""
+    for e in d.getVar("EXTRA_QTLIB", True).split():
+        templibs = "%s -not -name 'libQt5%s.so*' -and" % (templibs, e)
+    d.setVar("QTLIBSPRESERVE", templibs)
+}
+
 do_install() {
     # Fix install paths for all
     find -name "Makefile*" | xargs sed -i "s,(INSTALL_ROOT)${STAGING_DIR_NATIVE}${STAGING_DIR_NATIVE},(INSTALL_ROOT)${STAGING_DIR_NATIVE},g"
@@ -221,6 +231,7 @@ do_install() {
            ${D}${libdir}/pkgconfig
     find ${D}${libdir} -maxdepth 1 -name 'lib*' -and \
                                    -not -name 'libQt5Core.so*' -and \
+                                   ${QTLIBSPRESERVE} \
                                    -not -name 'libQt5Bootstrap.a' \
                                    -exec rm '{}' ';'
 }

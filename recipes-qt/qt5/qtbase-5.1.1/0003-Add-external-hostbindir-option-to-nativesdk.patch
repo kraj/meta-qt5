@@ -1,0 +1,225 @@
+From 062621e0310eddb448ebcc27fc4c1507c2d6e30d Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Sat, 6 Apr 2013 13:15:07 +0200
+Subject: [PATCH 03/22] Add -external-hostbindir option
+
+* when cross-compiling it's sometimes useful to use existing tools from machine
+  (or in OpenEmbedded built with separate native recipe) when building for target
+
+* this way we can skip bootstraping tools we already have
+
+Upstream-Status: Pending
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ configure                           | 16 +++++++++++++++-
+ mkspecs/features/qt_functions.prf   |  5 ++++-
+ mkspecs/features/qt_tool.prf        |  2 +-
+ qmake/property.cpp                  |  1 +
+ qtbase.pro                          | 12 +++++++++---
+ src/corelib/global/qlibraryinfo.cpp |  3 ++-
+ src/corelib/global/qlibraryinfo.h   |  1 +
+ tools/configure/configureapp.cpp    |  8 ++++++++
+ 8 files changed, 41 insertions(+), 7 deletions(-)
+
+Index: qtbase-opensource-src-5.1.1/configure
+===================================================================
+--- qtbase-opensource-src-5.1.1.orig/configure	2014-12-11 00:08:13.668470108 +0000
++++ qtbase-opensource-src-5.1.1/configure	2014-12-11 00:24:52.416470108 +0000
+@@ -1046,6 +1046,7 @@
+ QT_HOST_BINS=
+ QT_HOST_LIBS=
+ QT_HOST_DATA=
++QT_EXTERNAL_HOST_BINS=
+ 
+ #flags for SQL drivers
+ QT_CFLAGS_PSQL=
+@@ -1191,7 +1192,8 @@
+     -android-ndk-platform| \
+     -android-ndk-host| \
+     -android-arch| \
+-    -android-toolchain-version)
++    -android-toolchain-version| \
++    -external-hostbindir)
+         VAR=`echo $1 | sed "s,^-\(.*\),\1,"`
+         shift
+         VAL="$1"
+@@ -1379,6 +1381,9 @@
+     hostlibdir)
+         QT_HOST_LIBS="$VAL"
+         ;;
++    external-hostbindir)
++        QT_EXTERNAL_HOST_BINS="$VAL"
++        ;;
+     pkg-config)
+         if [ "$VAL" = "yes" ] || [ "$VAL" = "no" ]; then
+             CFG_PKGCONFIG="$VAL"
+@@ -3240,6 +3245,11 @@
+     QMAKE_CONFIG="$QMAKE_CONFIG compile_examples"
+ fi
+ 
++# default is empty, don't call makeabs if it is empty
++if [ ! -z "$QT_EXTERNAL_HOST_BINS" ]; then
++    QT_EXTERNAL_HOST_BINS=`"$relpath/config.tests/unix/makeabs" "$QT_EXTERNAL_HOST_BINS"`
++fi
++
+ #-------------------------------------------------------------------------------
+ # help - interactive parts of the script _after_ this section please
+ #-------------------------------------------------------------------------------
+@@ -3408,6 +3418,9 @@
+     -hostdatadir <dir> . Data used by qmake will be installed to <dir>
+                          (default HOSTPREFIX)
+ 
++    -external-hostbindir <dir> Use external host executables instead of building them
++                         (not used by defaut)
++
+ Configure options:
+ 
+  The defaults (*) are usually acceptable. A plus (+) denotes a default value
+@@ -3923,6 +3936,7 @@
+     "qt_hbinpath=$QT_HOST_BINS",
+     "qt_hlibpath=$QT_HOST_LIBS",
+     "qt_hdatpath=$QT_HOST_DATA",
++    "qt_ebinpath=$QT_EXTERNAL_HOST_BINS",
+     "qt_targspec=$shortxspec",
+     "qt_hostspec=$shortspec",
+ #endif
+Index: qtbase-opensource-src-5.1.1/mkspecs/features/qt_functions.prf
+===================================================================
+--- qtbase-opensource-src-5.1.1.orig/mkspecs/features/qt_functions.prf	2013-08-25 18:03:47.000000000 +0000
++++ qtbase-opensource-src-5.1.1/mkspecs/features/qt_functions.prf	2014-12-11 00:08:13.892470108 +0000
+@@ -194,7 +194,12 @@
+ defineTest(qtPrepareTool) {
+     $$1 = $$eval(QT_TOOL.$${2}.binary)
+     isEmpty($$1) {
+-        $$1 = $$[QT_HOST_BINS]/$$2
++        $$1 = $$[QT_EXTERNAL_HOST_BINS]/$$2
++        QT_EXTERNAL_HOST_BINS = $$[QT_EXTERNAL_HOST_BINS]/$$2
++        isEmpty(QT_EXTERNAL_HOST_BINS): \
++            $$1 = $$[QT_HOST_BINS]/$$2 \
++        else: \
++            $$1 = $$[QT_EXTERNAL_HOST_BINS]/$$
+         exists($$eval($$1).pl) {
+             $$1 = perl -w $$eval($$1).pl
+         } else: contains(QMAKE_HOST.os, Windows) {
+Index: qtbase-opensource-src-5.1.1/mkspecs/features/qt_tool.prf
+===================================================================
+--- qtbase-opensource-src-5.1.1.orig/mkspecs/features/qt_tool.prf	2013-08-25 18:03:47.000000000 +0000
++++ qtbase-opensource-src-5.1.1/mkspecs/features/qt_tool.prf	2014-12-11 00:08:13.892470108 +0000
+@@ -12,11 +12,12 @@
+ load(qt_app)
+ 
+ CONFIG += console
++QT_EXTERNAL_HOST_BINS = $$[QT_EXTERNAL_HOST_BINS]
+ 
+ # If we are doing a prefix build, create a "module" pri which enables
+ # qtPrepareTool() to work with the non-installed build.
+ # Non-bootstrapped tools always need this because of the environment setup.
+-!build_pass:if(!host_build|!force_bootstrap|force_independent) {
++!build_pass:if(!host_build|!force_bootstrap|force_independent):isEmpty(QT_EXTERNAL_HOST_BINS) {
+     isEmpty(MODULE):MODULE = $$TARGET
+ 
+     !host_build|!force_bootstrap: MODULE_DEPENDS = $$replace(QT, -private$, )
+Index: qtbase-opensource-src-5.1.1/qmake/property.cpp
+===================================================================
+--- qtbase-opensource-src-5.1.1.orig/qmake/property.cpp	2013-08-25 18:04:06.000000000 +0000
++++ qtbase-opensource-src-5.1.1/qmake/property.cpp	2014-12-11 00:08:13.892470108 +0000
+@@ -75,6 +75,7 @@
+     { "QT_HOST_DATA", QLibraryInfo::HostDataPath, true },
+     { "QT_HOST_BINS", QLibraryInfo::HostBinariesPath, true },
+     { "QT_HOST_LIBS", QLibraryInfo::HostLibrariesPath, true },
++    { "QT_EXTERNAL_HOST_BINS", QLibraryInfo::ExternalHostBinariesPath, true },
+     { "QMAKE_SPEC", QLibraryInfo::HostSpecPath, true },
+     { "QMAKE_XSPEC", QLibraryInfo::TargetSpecPath, true },
+ };
+Index: qtbase-opensource-src-5.1.1/qtbase.pro
+===================================================================
+--- qtbase-opensource-src-5.1.1.orig/qtbase.pro	2013-08-25 18:03:43.000000000 +0000
++++ qtbase-opensource-src-5.1.1/qtbase.pro	2014-12-11 00:27:57.472470254 +0000
+@@ -70,16 +70,24 @@
+ 
+ #qmake
+ qmake.path = $$[QT_HOST_BINS]
++qmake.files = $$OUT_PWD/bin/qmake
++QT_EXTERNAL_HOST_BINS = $$[QT_EXTERNAL_HOST_BINS]
++!isEmpty(QT_EXTERNAL_HOST_BINS) {
++   qmake.files = $$[QT_EXTERNAL_HOST_BINS]/qmake
++}
+ equals(QMAKE_HOST.os, Windows) {
+-   qmake.files = $$OUT_PWD/bin/qmake.exe
+-} else {
+-   qmake.files = $$OUT_PWD/bin/qmake
++   qmake.files = $${qmake.files}.exe
+ }
+ INSTALLS += qmake
+ 
+ #syncqt
+ syncqt.path = $$[QT_HOST_BINS]
+ syncqt.files = $$PWD/bin/syncqt.pl
++syncqt.files = $$PWD/bin/syncqt.pl
++QT_EXTERNAL_HOST_BINS = $$[QT_EXTERNAL_HOST_BINS]
++!isEmpty(QT_EXTERNAL_HOST_BINS) {
++   syncqt.files = $$[QT_EXTERNAL_HOST_BINS]/syncqt.pl
++}
+ INSTALLS += syncqt
+ 
+ # If we are doing a prefix build, create a "module" pri which enables
+Index: qtbase-opensource-src-5.1.1/src/corelib/global/qlibraryinfo.cpp
+===================================================================
+--- qtbase-opensource-src-5.1.1.orig/src/corelib/global/qlibraryinfo.cpp	2014-12-11 00:08:13.772470107 +0000
++++ qtbase-opensource-src-5.1.1/src/corelib/global/qlibraryinfo.cpp	2014-12-11 00:08:13.896470107 +0000
+@@ -270,7 +270,7 @@
+  */
+ 
+ static const struct {
+-    char key[19], value[13];
++    char key[21], value[13];
+ } qtConfEntries[] = {
+     { "Prefix", "." },
+     { "Documentation", "doc" }, // should be ${Data}/doc
+@@ -296,6 +296,7 @@
+     { "HostBinaries", "bin" },
+     { "HostLibraries", "lib" },
+     { "HostData", "." },
++    { "ExternalHostBinaries", "" },
+     { "TargetSpec", "" },
+     { "HostSpec", "" },
+ #endif
+Index: qtbase-opensource-src-5.1.1/src/corelib/global/qlibraryinfo.h
+===================================================================
+--- qtbase-opensource-src-5.1.1.orig/src/corelib/global/qlibraryinfo.h	2013-08-25 18:03:37.000000000 +0000
++++ qtbase-opensource-src-5.1.1/src/corelib/global/qlibraryinfo.h	2014-12-11 00:08:13.896470107 +0000
+@@ -84,6 +84,7 @@
+         HostBinariesPath,
+         HostLibrariesPath,
+         HostDataPath,
++        ExternalHostBinariesPath,
+         TargetSpecPath,
+         HostSpecPath,
+         LastHostPath = HostSpecPath,
+Index: qtbase-opensource-src-5.1.1/tools/configure/configureapp.cpp
+===================================================================
+--- qtbase-opensource-src-5.1.1.orig/tools/configure/configureapp.cpp	2013-08-25 18:03:28.000000000 +0000
++++ qtbase-opensource-src-5.1.1/tools/configure/configureapp.cpp	2014-12-11 00:24:52.544470108 +0000
+@@ -1162,6 +1162,13 @@
+             dictionary[ "QT_HOST_DATA" ] = configCmdLine.at(i);
+         }
+ 
++        else if (configCmdLine.at(i) == "-external-hostbindir") {
++            ++i;
++            if (i == argCount)
++                break;
++            dictionary[ "QT_EXTERNAL_HOST_BINS" ] = configCmdLine.at(i);
++        }
++
+         else if (configCmdLine.at(i) == "-make-tool") {
+             ++i;
+             if (i == argCount)
+@@ -3708,6 +3715,7 @@
+                   << "    \"qt_hbinpath=" << formatPath(dictionary["QT_HOST_BINS"]) << "\"," << endl
+                   << "    \"qt_hlibpath=" << formatPath(dictionary["QT_HOST_LIBS"]) << "\"," << endl
+                   << "    \"qt_hdatpath=" << formatPath(dictionary["QT_HOST_DATA"]) << "\"," << endl
++                  << "    \"qt_ebinpath=" << formatPath(dictionary["QT_EXTERNAL_HOST_BINS"]) << "\"," << endl
+                   << "    \"qt_targspec=" << targSpec << "\"," << endl
+                   << "    \"qt_hostspec=" << hostSpec << "\"," << endl
+                   << "#endif" << endl

@@ -10,6 +10,9 @@ SRC_URI += " \
     http://download.qt-project.org/official_releases/qt/${QT_VERSION_DIR}/${QT_VERSION}/submodules/${QT_MODULE}-opensource-src-${QT_VERSION}.tar.xz \
 "
 
+SRC_URI[md5sum] = "022073d32ff9d408de0182b5d1f01781"
+SRC_URI[sha256sum] = "2b42c6d5feeccffb67e890b86a150bae64dd2ff550be39a3cc449ee0e95462b6"
+
 S = "${WORKDIR}/${QT_MODULE}-opensource-src-${QT_VERSION}"
 
 LICENSE = "GFDL-1.3 & LGPL-2.1 | GPL-3.0"
