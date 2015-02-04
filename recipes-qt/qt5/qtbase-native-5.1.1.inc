@@ -7,7 +7,9 @@ QT_MODULE = "qtbase"
 
 require qt5-native.inc
 
-# shared with target qtbase, all except 
+CLEANBROKEN = "1"
+
+# shared with target qtbase, all except
 # 0005-qmake-is-already-built-in-qtbase-native.patch
 # 0006-Allow-building-a-separate-qmake-for-the-target.patch
 
