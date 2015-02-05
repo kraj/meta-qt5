@@ -1,11 +1,25 @@
-require qt5-${PV}.inc
+LICENSE = "GFDL-1.3 & LGPL-2.1 | GPL-3.0"
+LIC_FILES_CHKSUM = "file://LICENSE.LGPL;md5=4193e7f1d47a858f6b7c0f1ee66161de \
+                    file://LICENSE.GPL;md5=d32239bcb673463ab874e80d47fae504 \
+                    file://LGPL_EXCEPTION.txt;md5=0145c4d1b6f96a661c2c139dfb268fb6 \
+                    file://LICENSE.FDL;md5=6d9f2a9af4c8b8c3c769f6cc1b6aaf7e"
+
+SRCREV = "${AUTOREV}"
+SRC_URI += "git://${RDK_GIT}/rdk/components/opensource/qt5_1/generic;protocol=${RDK_GIT_PROTOCOL};branch=${RDK_GIT_BRANCH}"
+
+S = "${WORKDIR}/git/source/qtbase"
+
 require ${PN}-${PV}.inc
+
+do_configure_prepend() {
+        rm -rf ${S}/../../components ${S}/../../qtbrowser \
+               ${S}/../../webtests ${S}/../qtwebengine/ \
+               ${S}/../qtimageformats ${S}/../qtwebkit-examples/ \
+               ${S}/../default_platform ${S}/../qtwebkit
+}
 
 do_install_append() {
     # for modules which are still using syncqt and call qtPrepareTool(QMAKE_SYNCQT, syncqt)
     # e.g. qt3d, qtwayland
     ln -sf syncqt.pl ${D}${OE_QMAKE_PATH_QT_BINS}/syncqt
 }
-
-SRC_URI[md5sum] = "955d1e4da875f3872ef3208f21a757dd"
-SRC_URI[sha256sum] = "d4620e0b1aff6d2b6f4d8066e6f8258e012a8b5507af7c03b661029a1ffa75c9"

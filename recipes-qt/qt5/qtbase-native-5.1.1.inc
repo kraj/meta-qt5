@@ -27,6 +27,7 @@ SRC_URI += " \
     file://0013-Disable-mkv8snapshot.patch \
     file://0014-enables-tslib-device-to-be-read-from-env-variable.patch \
     file://0015-qtbase-allow-build-of-examples.patch \
+    file://0025-force-setting-of-MODULE_SYNCQT_DIR-correctly.patch \
 "
 
 # specific for native version
