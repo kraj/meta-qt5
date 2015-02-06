@@ -15,7 +15,8 @@ do_configure_prepend() {
         rm -rf ${S}/../../components ${S}/../../qtbrowser \
                ${S}/../../webtests ${S}/../qtwebengine/ \
                ${S}/../qtimageformats ${S}/../qtwebkit-examples/ \
-               ${S}/../default_platform ${S}/../qtwebkit
+               ${S}/../default_platform ${S}/../qtwebkit \
+               ${S}/../qt.pro ${S}/../configure
 }
 
 do_install_append() {
