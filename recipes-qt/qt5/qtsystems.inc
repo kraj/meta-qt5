@@ -1,6 +1,15 @@
 require qt5.inc
 
-DEPENDS += "qtbase qtdeclarative udev bluez4 gconf"
+DEPENDS += "qtbase qtdeclarative udev gconf"
+
+PACKAGECONFIG ??= ""
+PACKAGECONFIG[bluez4] = "OE_BLUEZ_ENABLED,,bluez4"
+
+do_configure_prepend() {
+    export QMAKE_CACHE_EVAL="CONFIG+=${EXTRA_OECONF}"
+    # disable bluez test if it isn't enabled by PACKAGECONFIG
+    sed -i 's/^    qtCompileTest(bluez)/    OE_BLUEZ_ENABLED:qtCompileTest(bluez)/g' ${S}/qtsystems.pro
+}
 
 LICENSE = "BSD & LGPL-2.1 & GFDL-1.3"
 # LICENSE files are missing in 5.0.0
