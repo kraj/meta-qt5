@@ -18,3 +18,6 @@ do_configure_prepend() {
                ${S}/../default_platform ${S}/../qtwebkit \
                ${S}/../qt.pro ${S}/../configure
 }
+
+INSANE_SKIP_${PN}-examples-dev += "dev-so"
+INSANE_SKIP_${PN}-examples-dev += "dev-elf"
