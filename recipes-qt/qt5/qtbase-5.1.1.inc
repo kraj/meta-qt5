@@ -1,5 +1,7 @@
 require qt5.inc
 
+B = "${S}"
+
 SRC_URI += " \
     file://0001-Add-linux-oe-g-platform.patch \
     file://0002-qlibraryinfo-allow-to-set-qt.conf-from-the-outside-u.patch \
@@ -165,7 +167,7 @@ do_configure() {
     # we need symlink in path relative to source, because
     # EffectivePaths:Prefix is relative to qmake location
     if [ ! -e ${B}/bin/qmake ]; then
-        mkdir ${B}/bin
+        mkdir -p ${B}/bin
         ln -sf ${OE_QMAKE_QMAKE_ORIG} ${B}/bin/qmake
     fi
 
@@ -202,13 +204,13 @@ do_configure() {
 do_compile_append() {
     # Build qmake for the target arch
     # Disable for now, because doesn't work well with separate ${B}
-    # cp -ra ${S}/qmake ${B}
-    # cd ${B}/qmake
-    # ${OE_QMAKE_QMAKE}
+    #cp -ra ${S}/qmake ${B}
+    cd ${B}/qmake
+    ../${OE_QMAKE_QMAKE}
     # Fix to use headers in ${B}
-    # sed '/INCPATH/s#${S}#${B}#g' -i Makefile
-    # oe_runmake CC="${CC}" CXX="${CXX}"
-    # cd ${B}
+    sed '/INCPATH/s#${S}#${B}#g' -i Makefile
+    oe_runmake CC="${CC}" CXX="${CXX}"
+    cd ${B}
 }
 
 do_install_append() {
@@ -221,6 +223,7 @@ do_install_append() {
     if [ ! -d ${D}/${OE_QMAKE_PATH_LIBS}/fonts ]; then
         cp -a ${S}/lib/fonts ${D}/${OE_QMAKE_PATH_LIBS}
     fi
+    oe_runmake INSTALL_ROOT=${D} install_qmake
 }
 
 PACKAGES =. " \
