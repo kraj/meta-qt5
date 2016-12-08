@@ -1,0 +1,32 @@
+Index: qtbase/src/src.pro
+===================================================================
+--- qtbase.orig/src/src.pro
++++ qtbase/src/src.pro
+@@ -129,10 +129,12 @@ contains(QT_CONFIG, concurrent):SUBDIRS
+             src_plugins.depends += src_opengl
+         }
+ #COMCAST MODIFICATION BEGIN
+-        !wince* {
++        contains(QT_CONFIG, printsupport) {
++            !wince* {
+ #COMCAST MODIFICATION END
+-            SUBDIRS += src_printsupport
+-            src_plugins.depends += src_printsupport
++                SUBDIRS += src_printsupport
++                src_plugins.depends += src_printsupport
++            }
+         }
+     }
+ }
+Index: qtbase/src/plugins/plugins.pro
+===================================================================
+--- qtbase.orig/src/plugins/plugins.pro
++++ qtbase/src/plugins/plugins.pro
+@@ -5,4 +5,6 @@ qtHaveModule(network): SUBDIRS += bearer
+ qtHaveModule(gui): SUBDIRS *= imageformats platforms platforminputcontexts platformthemes generic
+ qtHaveModule(widgets): SUBDIRS += accessible
+ 
+-!wince*:qtHaveModule(widgets): SUBDIRS += printsupport
++contains(QT_CONFIG, printsupport) {
++    !wince*:qtHaveModule(widgets): SUBDIRS += printsupport
++}

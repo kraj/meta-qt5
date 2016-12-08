@@ -1,0 +1,29 @@
+From 9d253de97def4f75f906b9e2a05275944997bba9 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 1 Dec 2016 16:04:26 -0800
+Subject: [PATCH] don't create packageconfig files for internal modules and
+ frameworks
+
+We only need .pc files for public portions of modules
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ source/qtbase/mkspecs/features/qt_module.prf | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/mkspecs/features/qt_module.prf b/mkspecs/features/qt_module.prf
+index 390fb49..6b2eb76 100644
+--- a/mkspecs/features/qt_module.prf
++++ b/mkspecs/features/qt_module.prf
+@@ -127,7 +127,7 @@ android: CONFIG += qt_android_deps
+ #install directives
+ load(qt_installs)
+ 
+-unix|win32-g++* {
++!internal_module:!qt_framework:if(unix|win32-g++*) {
+    CONFIG += create_pc
+    host_build: \
+        QMAKE_PKGCONFIG_LIBDIR = $$[QT_HOST_LIBS]
+-- 
+2.10.2
+

@@ -1,0 +1,12 @@
+diff -ru qtwebkit-opensource-src-5.1.1/Source/WebCore/WebCore.pri qtwebkit-opensource-src-5.1.1/Source/WebCore/WebCore.pri
+--- qtwebkit-opensource-src-5.1.1/Source/WebCore/WebCore.pri	2014-02-04 19:33:12.099958982 -0800
++++ qtwebkit-opensource-src-5.1.1/Source/WebCore/WebCore.pri	2014-02-05 03:31:18.481357888 -0800
+@@ -10,7 +10,6 @@
+ QT *= network sql core-private gui-private
+ 
+ 
+-DEFINES += ENABLE_DLNA_VIDEO_PLAYER
+ enable?(WINDOWLESS_FLASH_PLUGIN) {
+     QT *= opengl
+ }
+

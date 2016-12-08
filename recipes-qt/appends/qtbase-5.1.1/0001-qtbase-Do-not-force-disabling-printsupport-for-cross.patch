@@ -1,0 +1,28 @@
+From 9cd4dfd52ef50d16711768598b7f259ab820b013 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 1 Dec 2016 14:32:48 -0800
+Subject: [PATCH] qtbase: Do not force disabling printsupport for cross compile
+
+There are other ways to do it
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ source/qtbase/src/src.pro | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git qtbase-opensource-src-5.1.0.orig/src/src.pro qtbase-opensource-src-5.1.0.orig/src/src.pro
+index bc5947c..04c21bd 100644
+--- qtbase-opensource-src-5.1.0.orig/src/src.pro
++++ qtbase-opensource-src-5.1.0.orig/src/src.pro
+@@ -129,7 +129,7 @@ contains(QT_CONFIG, concurrent):SUBDIRS += src_concurrent
+             src_plugins.depends += src_opengl
+         }
+ #COMCAST MODIFICATION BEGIN
+-        !cross_compile:!wince* {
++        !wince* {
+ #COMCAST MODIFICATION END
+             SUBDIRS += src_printsupport
+             src_plugins.depends += src_printsupport
+-- 
+2.10.2
+
