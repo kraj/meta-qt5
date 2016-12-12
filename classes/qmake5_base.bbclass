@@ -164,7 +164,7 @@ qmake5_base_do_configure () {
 
 qmake5_base_do_install() {
     # Fix install paths for all
-    find -name "Makefile*" | xargs sed -i "s,(INSTALL_ROOT)${STAGING_DIR_TARGET},(INSTALL_ROOT),g"
+    find . -name "Makefile*" | xargs -r sed -i "s,(INSTALL_ROOT)${STAGING_DIR_TARGET},(INSTALL_ROOT),g"
 
     oe_runmake install INSTALL_ROOT=${D}
 
@@ -182,5 +182,9 @@ qmake5_base_do_install() {
             rmdir ${TMP}
             TMP=`dirname ${TMP}`;
         done
+    fi
+    if ls ${D}${libdir}/pkgconfig/Qt5*.pc >/dev/null 2>/dev/null; then
+        sed -i "s@-L${STAGING_LIBDIR}@-L\${libdir}@g" ${D}${libdir}/pkgconfig/Qt5*.pc
+        sed -i "s@libdir=${STAGING_LIBDIR}@libdir=\${libdir}@g" ${D}${libdir}/pkgconfig/Qt5*.pc
     fi
 }

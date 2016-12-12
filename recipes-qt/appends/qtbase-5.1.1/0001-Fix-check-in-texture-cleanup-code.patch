@@ -1,0 +1,27 @@
+From 14d2c012620254dd18236aa579653bcbfce01904 Mon Sep 17 00:00:00 2001
+From: Sean Harmer <sean.harmer@kdab.com>
+Date: Sun, 29 Sep 2013 20:13:32 +0100
+Subject: [PATCH] Fix check in texture cleanup code
+
+Change-Id: Iaf91cf27d64aedb71a8af7ba318ff1231ff11b0d
+Reviewed-by: Giuseppe D'Angelo <giuseppe.dangelo@kdab.com>
+---
+ src/gui/opengl/qopengltexture.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/gui/opengl/qopengltexture.cpp b/src/gui/opengl/qopengltexture.cpp
+index d053937..a6e1c29 100644
+--- a/src/gui/opengl/qopengltexture.cpp
++++ b/src/gui/opengl/qopengltexture.cpp
+@@ -175,7 +175,7 @@ bool QOpenGLTexturePrivate::create()
+ 
+ void QOpenGLTexturePrivate::destroy()
+ {
+-    if (QOpenGLContext::currentContext() == context) {
++    if (QOpenGLContext::currentContext() != context) {
+         qWarning("Requires a valid current OpenGL context.\n"
+                  "Texture has not been destroyed");
+         return;
+-- 
+2.10.2
+

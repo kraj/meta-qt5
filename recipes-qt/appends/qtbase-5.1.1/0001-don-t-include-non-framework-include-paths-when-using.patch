@@ -1,0 +1,42 @@
+From ca06fcfb43e15041c530c79bcb427377a5f409d1 Mon Sep 17 00:00:00 2001
+From: Oswald Buddenhagen <oswald.buddenhagen@digia.com>
+Date: Tue, 18 Jun 2013 14:16:32 +0200
+Subject: [PATCH] don't include non-framework include paths when using
+ frameworks
+
+Change-Id: Ia72d5b611b9870b83846299bc7642841b09b84b1
+Reviewed-by: Joerg Bornemann <joerg.bornemann@digia.com>
+---
+ mkspecs/features/qt_functions.prf | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/mkspecs/features/qt_functions.prf b/mkspecs/features/qt_functions.prf
+index 2f2c94c..f055be7 100644
+--- a/mkspecs/features/qt_functions.prf
++++ b/mkspecs/features/qt_functions.prf
+@@ -71,11 +71,6 @@ defineTest(qtAddModule) {
+     MODULE_LIBS_ADD = $$MODULE_LIBS
+     MODULE_LIBS_ADD -= $$QMAKE_DEFAULT_LIBDIRS
+ 
+-    INCLUDEPATH *= $$MODULE_INCLUDES
+-    auto_use_privates|isEqual(2, UsePrivate) { # Tests function parameter 2 ($$2) being equal to 'UsePrivate'
+-        INCLUDEPATH += $$eval(QT.$${1}.private_includes)
+-    }
+-
+     unset(LINKAGE)
+     mac:contains(MODULE_CONFIG, lib_bundle) {
+           FRAMEWORK_INCLUDE = $${MODULE_LIBS}/$${MODULE_NAME}.framework/Headers
+@@ -88,6 +83,10 @@ defineTest(qtAddModule) {
+                     $$FRAMEWORK_INCLUDE/$$eval(QT.$${1}.VERSION)/$$MODULE_NAME
+           QMAKE_FRAMEWORKPATH *= $${MODULE_LIBS}
+           LINKAGE += -framework $${MODULE_NAME}$${QT_LIBINFIX}
++    } else {
++          INCLUDEPATH *= $$MODULE_INCLUDES
++          auto_use_privates|isEqual(2, UsePrivate): \
++               INCLUDEPATH += $$eval(QT.$${1}.private_includes)
+     }
+ 
+     # Re-insert the major version in the library name (cf qtLibraryTarget above)
+-- 
+2.10.2
+

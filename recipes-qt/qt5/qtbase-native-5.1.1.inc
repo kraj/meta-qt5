@@ -21,7 +21,6 @@ SRC_URI += " \
     file://0007-configureapp-Prefix-default-LIBDIRS-and-INCDIRS-with.patch \
     file://0008-qt_module-Fix-pkgconfig-replacement.patch \
     file://0009-qt_module-Fix-paths-in-.prl-files.patch \
-    file://0010-wayland-scanner-disable-silent-rules.patch \
     file://0011-configure-don-t-export-SYSTEM_VARIABLES-to-.qmake.va.patch \
     file://0012-configure.prf-Allow-to-add-extra-arguments-to-make.patch \
     file://0013-Disable-mkv8snapshot.patch \

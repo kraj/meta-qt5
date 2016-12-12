@@ -1,0 +1,10 @@
+Index: git/examples/wayland/qwindow-compositor/qwindow-compositor.pro
+===================================================================
+--- git.orig/examples/wayland/qwindow-compositor/qwindow-compositor.pro
++++ git/examples/wayland/qwindow-compositor/qwindow-compositor.pro
+@@ -1,4 +1,4 @@
+-QT += gui gui-private core-private compositor
++QT += gui gui-private core-private compositor opengl
+ 
+ LIBS += -L ../../lib
+ #include (../../src/qt-compositor/qt-compositor.pri)

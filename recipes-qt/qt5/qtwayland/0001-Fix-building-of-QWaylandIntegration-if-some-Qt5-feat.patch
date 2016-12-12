@@ -1,0 +1,128 @@
+From de85e1c1ee76be845a21b441d9e4ea12a30d84c7 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Vesa=20J=C3=A4=C3=A4skel=C3=A4inen?= <dachaac@gmail.com>
+Date: Sun, 18 Sep 2016 11:51:59 +0300
+Subject: [PATCH] Fix building of QWaylandIntegration if some Qt5 features are
+ disabled.
+
+QPlatformIntegration's interface methods are disabled based on QT_NO_OPENGL,
+QT_NO_CLIPBOARD, QT_NO_DRAGANDDROP, QT_NO_ACCESSIBILITY and
+QT_NO_SESSIONMANAGER, these has to be taken into account when compiling
+QtWayland.
+---
+ src/client/qwaylandintegration.cpp | 21 ++++++++++++++++++---
+ src/client/qwaylandintegration_p.h | 12 ++++++++++++
+ 2 files changed, 30 insertions(+), 3 deletions(-)
+
+Index: git/src/client/qwaylandintegration.cpp
+===================================================================
+--- git.orig/src/client/qwaylandintegration.cpp
++++ git/src/client/qwaylandintegration.cpp
+@@ -46,7 +46,9 @@
+ #include "qwaylandinputcontext_p.h"
+ #include "qwaylandshmbackingstore_p.h"
+ #include "qwaylandnativeinterface_p.h"
++#ifndef QT_NO_CLIPBOARD
+ #include "qwaylandclipboard_p.h"
++#endif
+ #include "qwaylanddnd_p.h"
+ #include "qwaylandwindowmanagerintegration_p.h"
+ #include "qwaylandscreen_p.h"
+@@ -63,7 +65,9 @@
+ #include <QtGui/QOpenGLContext>
+ 
+ #include <qpa/qplatforminputcontextfactory_p.h>
++#ifndef QT_NO_ACCESSIBILITY
+ #include <qpa/qplatformaccessibility.h>
++#endif
+ #include <qpa/qplatforminputcontext.h>
+ 
+ #include "qwaylandhardwareintegration_p.h"
+@@ -117,24 +121,29 @@ QWaylandIntegration::QWaylandIntegration
+     , mNativeInterface(new QWaylandNativeInterface(this))
+ #ifndef QT_NO_ACCESSIBILITY
+     , mAccessibility(new QPlatformAccessibility())
+-#else
+-    , mAccessibility(0)
+ #endif
+     , mClientBufferIntegrationInitialized(false)
+     , mServerBufferIntegrationInitialized(false)
+     , mShellIntegrationInitialized(false)
+ {
+     mDisplay = new QWaylandDisplay(this);
++#ifndef QT_NO_CLIPBOARD
+     mClipboard = new QWaylandClipboard(mDisplay);
++#endif
++#ifndef QT_NO_DRAGANDDROP
+     mDrag = new QWaylandDrag(mDisplay);
+-
++#endif
+     mInputContext.reset(new QWaylandInputContext(mDisplay));
+ }
+ 
+ QWaylandIntegration::~QWaylandIntegration()
+ {
++#ifndef QT_NO_DRAGANDDROP
+     delete mDrag;
++#endif
++#ifndef QT_NO_CLIPBOARD
+     delete mClipboard;
++#endif
+ #ifndef QT_NO_ACCESSIBILITY
+     delete mAccessibility;
+ #endif
+@@ -222,15 +231,19 @@ QPlatformFontDatabase *QWaylandIntegrati
+     return mFontDb;
+ }
+ 
++#ifndef QT_NO_CLIPBOARD
+ QPlatformClipboard *QWaylandIntegration::clipboard() const
+ {
+     return mClipboard;
+ }
++#endif
+ 
++#ifndef QT_NO_DRAGANDDROP
+ QPlatformDrag *QWaylandIntegration::drag() const
+ {
+     return mDrag;
+ }
++#endif
+ 
+ QPlatformInputContext *QWaylandIntegration::inputContext() const
+ {
+@@ -245,10 +258,12 @@ QVariant QWaylandIntegration::styleHint(
+     return QPlatformIntegration::styleHint(hint);
+ }
+ 
++#ifndef QT_NO_ACCESSIBILITY
+ QPlatformAccessibility *QWaylandIntegration::accessibility() const
+ {
+     return mAccessibility;
+ }
++#endif
+ 
+ QPlatformServices *QWaylandIntegration::services() const
+ {
+Index: git/src/client/qwaylandintegration_p.h
+===================================================================
+--- git.orig/src/client/qwaylandintegration_p.h
++++ git/src/client/qwaylandintegration_p.h
+@@ -106,12 +106,18 @@ private:
+     void initializeServerBufferIntegration();
+     void initializeShellIntegration();
+     QPlatformFontDatabase *mFontDb;
++#ifndef QT_NO_CLIPBOARD
+     QPlatformClipboard *mClipboard;
++#endif
++#ifndef QT_NO_DRAGANDDROP
+     QPlatformDrag *mDrag;
++#endif
+     QWaylandDisplay *mDisplay;
+     QPlatformNativeInterface *mNativeInterface;
+     QScopedPointer<QPlatformInputContext> mInputContext;
++#ifndef QT_NO_ACCESSIBILITY
+     QPlatformAccessibility *mAccessibility;
++#endif
+     bool mClientBufferIntegrationInitialized;
+     bool mServerBufferIntegrationInitialized;
+     bool mShellIntegrationInitialized;

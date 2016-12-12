@@ -12,8 +12,3 @@ EXTRA_QMAKEVARS_PRE += "${@base_contains('DISTRO_FEATURES', 'rdk-dlna', 'DEFINES
 PACKAGECONFIG = "${@base_contains('DISTRO_FEATURES', 'gstreamer1', 'gstreamer', 'gstreamer010', d)}"
 
 DEPENDS_remove = "qtdeclarative"
-
-do_install_append () {
-        rm -rf ${D}${libdir}/pkgconfig/Qt5WebKitWidgets.pc
-        rm -rf ${D}${libdir}/pkgconfig/Qt5WebKit.pc
-}

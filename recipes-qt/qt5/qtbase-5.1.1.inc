@@ -12,7 +12,6 @@ SRC_URI += " \
     file://0007-configureapp-Prefix-default-LIBDIRS-and-INCDIRS-with.patch \
     file://0008-qt_module-Fix-pkgconfig-replacement.patch \
     file://0009-qt_module-Fix-paths-in-.prl-files.patch \
-    file://0010-wayland-scanner-disable-silent-rules.patch \
     file://0011-configure-don-t-export-SYSTEM_VARIABLES-to-.qmake.va.patch \
     file://0012-configure.prf-Allow-to-add-extra-arguments-to-make.patch \
     file://0013-Disable-mkv8snapshot.patch \
@@ -109,8 +108,8 @@ PACKAGECONFIG[iconv] = "-iconv,-no-iconv,virtual/libiconv"
 PACKAGECONFIG[xkb] = "-xkb,-no-xkb,libxkbcommon"
 PACKAGECONFIG[evdev] = "-evdev,-no-evdev"
 # depends on glib
-PACKAGECONFIG[gstreamer010] = "-gstreamer,-no-gstreamer,gstreamer gst-plugins-base"
-PACKAGECONFIG[gstreamer] = "-gstreamer,-no-gstreamer,gstreamer1.0 gstreamer1.0-plugins-base"
+PACKAGECONFIG[gstreamer010] = "-gstreamer,,gstreamer gst-plugins-base"
+PACKAGECONFIG[gstreamer] = "-gstreamer,,gstreamer1.0 gstreamer1.0-plugins-base"
 PACKAGECONFIG[fontconfig] = "-fontconfig,-no-fontconfig,fontconfig"
 PACKAGECONFIG[gtkstyle] = "-gtkstyle,-no-gtkstyle,gtk+"
 PACKAGECONFIG[directfb] = "-directfb,-no-directfb,directfb"
@@ -133,8 +132,10 @@ QT_CONFIG_FLAGS += " \
     -silent \
     -no-pch \
     -no-rpath \
+    -no-gstreamer \
     -pkg-config \
     ${EXTRA_OECONF} \
+    ${PACKAGECONFIG_CONFARGS} \
 "
 
 do_generate_qt_config_file_append() {

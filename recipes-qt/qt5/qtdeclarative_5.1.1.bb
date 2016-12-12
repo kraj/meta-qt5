@@ -3,6 +3,9 @@ require ${PN}.inc
 
 DEPENDS += "qtjsbackend qtsvg qtxmlpatterns"
 
+CXXFLAGS_append = " -UQT_NO_FILEDIALOG"
+CFLAGS_append = " -UQT_NO_FILEDIALOG"
+
 SRC_URI += " \
     file://0003-Fix-wrong-calculation-of-viewPort-for-transitions.patch \
 "

@@ -73,6 +73,7 @@ QT_CONFIG_FLAGS += " \
     -no-rpath \
     -pkg-config \
     ${EXTRA_OECONF} \
+    ${PACKAGECONFIG_CONFARGS} \
 "
 
 # qtbase is exception, as these are used as install path for sysroots
