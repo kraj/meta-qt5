@@ -22,6 +22,7 @@ SRC_URI += " \
 PACKAGECONFIG ?= " \
     compositor-api \
     brcm-egl \
+    wayland-egl \
     xkb \
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'xcompositor xkb glx', '', d)} \
 "
